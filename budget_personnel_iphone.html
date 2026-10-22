@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12372a">
+<title>Mon Budget — FCFA</title>
+<style>
+:root{--green:#12372a;--mint:#dcefe5;--bg:#f4f7f4;--ink:#17231d;--muted:#66756d;--line:#e1e8e3;--red:#b33c36}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:var(--green);color:white;padding:22px 18px 24px;border-radius:0 0 24px 24px}
+header .eyebrow{font-size:12px;opacity:.8;letter-spacing:.08em;text-transform:uppercase}h1{margin:7px 0 3px;font-size:26px}header p{margin:0;opacity:.82;font-size:14px}
+main{max-width:720px;margin:auto;padding:14px 14px 42px}.balance{background:white;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:-7px;box-shadow:0 6px 22px #173b2710}
+.small{font-size:13px;color:var(--muted)}.amount{font-size:32px;font-weight:750;letter-spacing:-.03em;margin:5px 0 16px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:var(--bg);padding:12px;border-radius:12px}.stat strong{display:block;font-size:17px;margin-top:4px}.in{color:#18734b}.out{color:var(--red)}
+.tabs{display:flex;gap:8px;margin:16px 0;overflow:auto}.tabs button{border:1px solid var(--line);background:white;border-radius:99px;padding:10px 14px;white-space:nowrap;color:var(--ink)}.tabs button.active{background:var(--green);color:white;border-color:var(--green)}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}.panel h2{font-size:18px;margin:0 0 14px}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 6px}input,select,textarea{font:inherit;width:100%;border:1px solid #d5dfd8;border-radius:11px;padding:12px;background:#fff;color:var(--ink)}textarea{min-height:72px;resize:vertical}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.btn{border:0;border-radius:12px;padding:13px 15px;background:var(--green);color:white;font-weight:650;width:100%;margin-top:13px}.btn.secondary{background:var(--mint);color:var(--green)}.btn.danger{background:#fae7e5;color:#8b2924}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}.entry{padding:13px 0;border-bottom:1px solid var(--line)}.entry:last-child{border-bottom:0}.entry .title{font-weight:650}.entry .meta{font-size:12px;color:var(--muted);margin-top:4px}.entry .money{font-weight:750;white-space:nowrap}.empty{padding:20px 0;text-align:center;color:var(--muted);font-size:14px}
+.hidden{display:none!important}.monthbar{display:flex;gap:10px;align-items:center;margin-bottom:12px}.monthbar input{max-width:190px}.note{font-size:12px;color:var(--muted);line-height:1.5;margin-top:12px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:4px 20px 22px}
+@media(min-width:600px){main{padding-top:20px}.amount{font-size:38px}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">Gestion personnelle</div><h1>Mon Budget</h1><p>Mes entrées, mes sorties, mes objectifs — en FCFA</p></header>
+<main>
+<section class="balance">
+ <div class="small">Solde actuel</div><div class="amount" id="balance">0 FCFA</div>
+ <div class="stats">
+  <div class="stat"><span class="small">Entrées ce mois</span><strong class="in" id="incomeTotal">+0 FCFA</strong></div>
+  <div class="stat"><span class="small">Sorties ce mois</span><strong class="out" id="expenseTotal">−0 FCFA</strong></div>
+ </div>
+</section>
+<nav class="tabs">
+<button class="active" data-tab="add">＋ Opération</button><button data-tab="history">Historique</button><button data-tab="report">Bilan mensuel</button><button data-tab="settings">Paramètres</button>
+</nav>
+<section id="tab-add" class="panel">
+<h2>Ajouter une opération</h2>
+<form id="entryForm">
+ <div class="grid"><div><label for="type">Type</label><select id="type"><option value="expense">Sortie d'argent</option><option value="income">Entrée d'argent</option></select></div><div><label for="date">Date</label><input id="date" type="date" required></div></div>
+ <div class="grid"><div><label for="amount">Montant (FCFA)</label><input id="amount" type="number" min="1" step="1" placeholder="Ex. 2500" required></div><div><label for="category">Catégorie</label><select id="category"></select></div></div>
+ <label for="description">Titre / motif</label><input id="description" maxlength="90" placeholder="Ex. Transport, salaire, déjeuner" required>
+ <label for="note">Note complémentaire (facultatif)</label><textarea id="note" maxlength="500" placeholder="Détails, personne, mode de paiement…"></textarea>
+ <button class="btn" type="submit">Enregistrer l'opération</button>
+</form>
+<p class="note">Les données sont enregistrées dans le stockage local de ce navigateur sur cet appareil. Elles ne sont pas envoyées à une banque ni synchronisées automatiquement avec tes autres appareils.</p>
+</section>
+<section id="tab-history" class="panel hidden"><h2>Historique des opérations</h2><div class="monthbar"><label for="filterMonth" style="margin:0">Filtrer par mois</label><input id="filterMonth" type="month"></div><div id="historyList"></div><div class="actions"><button class="btn secondary" id="exportBtn">Exporter CSV</button><button class="btn danger" id="clearFilterBtn">Retirer le filtre</button></div></section>
+<section id="tab-report" class="panel hidden"><h2>Bilan mensuel</h2><div class="monthbar"><label for="reportMonth" style="margin:0">Mois</label><input id="reportMonth" type="month"></div><div class="stats"><div class="stat"><span class="small">Total des entrées</span><strong class="in" id="reportIn">0 FCFA</strong></div><div class="stat"><span class="small">Total des sorties</span><strong class="out" id="reportOut">0 FCFA</strong></div><div class="stat"><span class="small">Différence du mois</span><strong id="reportNet">0 FCFA</strong></div><div class="stat"><span class="small">Nombre d'opérations</span><strong id="reportCount">0</strong></div></div><h2 style="margin-top:18px">Dépenses par catégorie</h2><div id="categoryReport"></div><button class="btn secondary" id="reportExport">Exporter toutes les opérations (CSV)</button></section>
+<section id="tab-settings" class="panel hidden"><h2>Paramètres et sauvegarde</h2><label for="openingBalance">Solde de départ actuel (FCFA)</label><input id="openingBalance" type="number" step="1" placeholder="0"><button class="btn" id="saveBalance">Enregistrer le solde de départ</button><p class="note">Le solde actuel = solde de départ + toutes les entrées − toutes les sorties. Si tu commences aujourd'hui, indique l'argent que tu as déjà disponible avant d'enregistrer tes premières opérations.</p><hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><div class="actions"><button class="btn secondary" id="backupBtn">Sauvegarder mes données</button><button class="btn secondary" id="restoreBtn">Restaurer une sauvegarde</button></div><input class="hidden" type="file" id="restoreFile" accept="application/json"><button class="btn danger" id="deleteAll">Effacer toutes les données</button><p class="note">Conseil : exporte régulièrement tes opérations en CSV ou sauvegarde les données. Effacer l'historique du navigateur peut supprimer les données locales.</p></section>
+</main><footer>Mon Budget • FCFA • Outil personnel gratuit</footer>
+<script>
+const $=id=>document.getElementById(id);
+const incomeCats=['Salaire','Prime / bonus','Aide reçue','Vente','Remboursement','Autre revenu'];
+const expenseCats=['Transport','Alimentation','Logement / factures','Téléphone / internet','Famille / aide','Santé','Études / formation','Achats personnels','Loisirs / sorties','Épargne mise de côté','Dette / remboursement','Autre dépense'];
+const money=n=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(n)+' FCFA';
+const today=()=>{let d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const monthNow=()=>today().slice(0,7);
+let data={entries:[],opening:0};
+try{data={...data,...JSON.parse(localStorage.getItem('monBudgetFCFA')||'{}')}}catch(e){}
+function save(){localStorage.setItem('monBudgetFCFA',JSON.stringify(data))}
+function cats(){let list=$('type').value==='income'?incomeCats:expenseCats;let prev=$('category').value;$('category').innerHTML=list.map(x=>`<option>${x}</option>`).join('');if(list.includes(prev))$('category').value=prev}
+function total(entries,type){return entries.filter(x=>x.type===type).reduce((s,x)=>s+x.amount,0)}
+function monthEntries(m){return data.entries.filter(x=>x.date.startsWith(m))}
+function render(){
+ let m=monthNow(),me=monthEntries(m);
+ $('balance').textContent=money(data.opening+total(data.entries,'income')-total(data.entries,'expense'));
+ $('incomeTotal').textContent='+'+money(total(me,'income'));$('expenseTotal').textContent='−'+money(total(me,'expense'));
+ $('openingBalance').value=data.opening;
+ renderHistory();renderReport();
+}
+function renderHistory(){
+ let m=$('filterMonth').value;let es=[...data.entries].filter(x=>!m||x.date.startsWith(m)).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ $('historyList').innerHTML=es.length?es.map(x=>`<div class="entry"><div class="row"><div><div class="title">${esc(x.description)}</div><div class="meta">${x.date} · ${esc(x.category)}${x.note?' · '+esc(x.note):''}</div></div><div class="money ${x.type==='income'?'in':'out'}">${x.type==='income'?'+':'−'}${money(x.amount)}</div></div><button class="btn danger" style="width:auto;padding:7px 11px;margin-top:8px;font-size:12px" onclick="removeEntry(${x.id})">Supprimer</button></div>`).join(''):'<div class="empty">Aucune opération pour cette période.</div>';
+}
+function renderReport(){
+ let m=$('reportMonth').value||monthNow(),es=monthEntries(m),ins=total(es,'income'),outs=total(es,'expense');
+ $('reportIn').textContent=money(ins);$('reportOut').textContent=money(outs);$('reportNet').textContent=(ins-outs>0?'+':'')+money(ins-outs);$('reportCount').textContent=es.length;
+ let sums={};es.filter(x=>x.type==='expense').forEach(x=>sums[x.category]=(sums[x.category]||0)+x.amount);
+ let cats=Object.entries(sums).sort((a,b)=>b[1]-a[1]);
+ $('categoryReport').innerHTML=cats.length?cats.map(([c,v])=>`<div class="entry"><div class="row"><span>${esc(c)}</span><strong>${money(v)}</strong></div><div style="height:6px;background:#edf2ee;border-radius:6px;margin-top:7px;overflow:hidden"><div style="height:100%;width:${outs?Math.min(100,v/outs*100):0}%;background:#34785a;border-radius:6px"></div></div><div class="meta">${outs?Math.round(v/outs*100):0}% des sorties du mois</div></div>`).join(''):'<div class="empty">Aucune dépense enregistrée ce mois-ci.</div>';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+window.removeEntry=id=>{if(confirm('Supprimer cette opération ?')){data.entries=data.entries.filter(x=>x.id!==id);save();render()}};
+$('type').addEventListener('change',cats);$('date').value=today();$('filterMonth').value=monthNow();$('reportMonth').value=monthNow();cats();
+$('entryForm').addEventListener('submit',e=>{e.preventDefault();let amount=Number($('amount').value);if(!Number.isFinite(amount)||amount<=0)return alert('Saisis un montant positif.');data.entries.push({id:Date.now(),type:$('type').value,date:$('date').value,amount:Math.round(amount),category:$('category').value,description:$('description').value.trim(),note:$('note').value.trim()});save();$('amount').value='';$('description').value='';$('note').value='';render();alert('Opération enregistrée.');});
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));['add','history','report','settings'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==b.dataset.tab));render()}));
+$('filterMonth').addEventListener('change',renderHistory);$('reportMonth').addEventListener('change',renderReport);$('clearFilterBtn').onclick=()=>{$('filterMonth').value='';renderHistory()};
+$('saveBalance').onclick=()=>{let v=Number($('openingBalance').value);if(!Number.isFinite(v))return alert('Montant non valide.');data.opening=v;save();render();alert('Solde de départ enregistré.')};
+function csv(){let rows=[['Date','Type','Montant FCFA','Catégorie','Titre','Note'],...data.entries.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(x=>[x.date,x.type==='income'?'Entrée':'Sortie',x.amount,x.category,x.description,x.note])];return '\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n')}
+function download(content,name,type){let a=document.createElement('a'),url=URL.createObjectURL(new Blob([content],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+$('exportBtn').onclick=()=>download(csv(),'mon_budget_operations.csv','text/csv;charset=utf-8');$('reportExport').onclick=()=>download(csv(),'mon_budget_operations.csv','text/csv;charset=utf-8');
+$('backupBtn').onclick=()=>download(JSON.stringify(data,null,2),'sauvegarde_mon_budget.json','application/json');
+$('restoreBtn').onclick=()=>$('restoreFile').click();$('restoreFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let d=JSON.parse(await f.text());if(!Array.isArray(d.entries)||typeof d.opening!=='number')throw Error();if(confirm('Remplacer les données actuelles par la sauvegarde ?')){data=d;save();render();alert('Sauvegarde restaurée.')}}catch(err){alert('Fichier de sauvegarde invalide.')}e.target.value=''};
+$('deleteAll').onclick=()=>{if(confirm('Effacer définitivement toutes les opérations et le solde de départ de ce navigateur ?')){data={entries:[],opening:0};save();render();alert('Données effacées.')}};
+render();
+</script>
+</body></html>
